@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+  
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+  
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+
+
+.update {
+            width: 40%;
+            position: fixed;
+            top: -100%;
+            left: 28%;
+            height: 100%;
+          
+            z-index: 999; /* Ensure it's on top of other content */
+            transition: all .8s ease-in;
+        }
+        .update-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+      /* Styling for the modal */
+      
+
+      .modal {
+            width: 40%;
+            position: fixed;
+            top: -100%;
+            left: 28%;
+            height: 100%;
+          
+            z-index: 999; /* Ensure it's on top of other content */
+            transition: all .8s ease-in;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Style for the button */
+        #showModalBtn {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Style for the close button */
+        #closeModalBtn {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #closebtn {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Center the modal content */
+        .modal-content {
+            text-align: center;
+        }
+
+        /* Add some margin to form elements */
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+  </style>
+</head>
+<body class="w-full h-[100vh] flex justify-center flex-col items-center bg-blue-100 px-[5%]"> 
+      
+  <button id="showModalBtn" class="relative ml-auto">
+    Add 
+  </button>
+
+  <!-- The modal -->
+  <div id="myModal" class="modal">
+      <div class="modal-content">
+          <!-- Your form goes here -->
+          <h2 class="text-2xl text-slate-400 font-bold">Modal Form</h2>
+          <form class="flex flex-col w-[70%] h-[auto] justify-center m-auto p-4" method="post" action="/adduser">
+              <input type="text" id="name" class="bg-blue-100 rounded p-2 my-2" name="fullName" placeholder="Full Name">
+              <input type="number" class="bg-blue-100 rounded p-2 my-2 " id="phnumber" name="phnumber"  placeholder="Phone Number">
+              <input type="text" class="bg-blue-100 rounded p-2 my-2" id="gender" name="age" placeholder="age">
+              <input type="text" class="bg-blue-100 rounded p-2 my-2" id="mesg" name="mesg" placeholder="gender">
+              <input type="Date" class="bg-blue-100 rounded p-2 my-2" id="date" name="Join" >
+              <input type="number" class="bg-blue-100 rounded p-2 my-2" id="payment" name="payment" placeholder="payment">
+               
+
+              <button type="submit" class="bg-[#3498db] py-[5px] px-[10px] rounded text-xl font-bold text-white">Submit</button>
+          </form>
+          <!-- End of your form -->
+          <button id="closeModalBtn">Close</button>
+        </div>
+      </div>
+
+
+      <div id="update"  class="update">
+        <div class="update-content">
+            <!-- Your form goes here -->
+            <h2 class="text-2xl text-slate-400 font-bold">Update User</h2>
+            <form class="flex flex-col w-[70%] h-[auto] justify-center m-auto p-4" method="post" action="/adduser">
+                <input type="number" class="bg-blue-100 rounded p-2 my-2 " id="payment" name="phnumber"  placeholder="Phone Number">
+       
+                <button type="submit" class="bg-[#3498db] py-[5px] px-[10px] rounded text-xl font-bold text-white">Submit</button>
+            </form>
+            <!-- End of your form -->
+            <button id="closebtn">Close</button>
+          </div>
+        </div>
+      
+      <div class="showData" id="listdata">
+          
+      </div>
+      <script>
+
+        const  deleteMe = (id)=>{
+          const requestOptions = {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json', // Set the content type if needed
+    // You may need to include authentication headers here if your API requires it
+  },
+};
+          console.log("hello", id)
+          fetch(`/api/data/${id}`, requestOptions)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`Failed to delete user with ID ${id}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log(`User with ID ${id} has been deleted.`);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+        }
+
+
+       
+        let list = document.getElementById("listdata")
+           
+        const fetchData= ()=>{
+          fetch('/user/api')
+  .then(response => {
+      console.log(response)
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(data.data)
+    // Work with the JSON data here
+    let html = `
+      
+     <div class="w-full h-[400px] overflow-y-scroll ">
+       <table class="border-2 border-slate-400 p-4">
+        <thead class="p-4">
+          <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Series No</th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Name</th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Number </th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Age</th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Gender</th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Join Date</th>
+        <th class="border-2 border-slate-400 mx-2 text-lg font-bold p-2">Payment</th>
+
+        
+
+
+
+          </thead>
+           
+              ${
+                data.data.map((data,index)=>{
+                  const formattedDate = data.Join.split("T")[0];
+                  const date = new Date(formattedDate);
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formattedDat = new Intl.DateTimeFormat('en-GB', options).format(date);
+  console.log(formattedDat)
+
+                  return(
+                        
+                       `
+                      
+                      
+                       <tr  class="border-2 border-slate-400 p-4">
+                        <td  class="border-2 border-slate-400 p-4" >${index + 1}</td>
+                       <td  class="border-2 border-slate-400 p-4" >${data.fullName}</td>
+                       <td class="border-2 border-slate-400 p-4">${data.phnumber}</td>
+                       <td class="border-2 border-slate-400 p-4">${data.age}</td>
+                        <td class="border-2 border-slate-400 p-4">${data.mesg}</td>
+                        <td class="border-2 border-slate-400 p-4">${formattedDat}</td>
+                        <td class="border-2 border-slate-400 p-4">${data.payment}</td>
+
+
+                       <td class="border-2 border-slate-400 p-4">
+                        <form  method="POST" action="/delete/${data._id}">
+                        <button id=${data._id}>Delete</button>
+                        </form>
+                        </td>
+
+                        <td class="border-2 border-slate-400 p-4">
+                     
+                          <form  method="POST" action="/updateUser/${data._id}">
+                            <input type="number" name="payment" />
+
+                        <button >Update</button>
+                        </form>
+                        </td>
+                       </tr>
+                       </div>
+                       `
+
+           
+                  )
+                })
+              }
+           
+
+        </table>
+    `
+
+  
+
+    list.insertAdjacentHTML('beforeend',html)
+
+    check(formattedDat)
+
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+
+        }
+        const modal = document.getElementById('myModal');
+        const update = document.getElementById('update');
+
+        const showModalBtn = document.getElementById('showModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const closebtn = document.getElementById('closebtn')
+
+        // Function to show the modal
+        function showModal() {
+            modal.style.top = '5%';
+        }
+
+        // Function to hide the modal
+        function closeModal() {
+           
+            modal.style.top = '-100%';
+        }
+         let id;
+        const updateUser=(_id)=>{
+          update.style.top = '30%';
+           id = _id;      
+    
+        }
+        console.log(id)
+
+        const closeBtn=()=>{
+          update.style.top = '-100%';
+        }
+
+        // Attach click event listeners to the buttons
+        showModalBtn.addEventListener('click', showModal);
+        closebtn.addEventListener('click',closeBtn)
+        closeModalBtn.addEventListener('click', closeModal);
+         fetchData()
+      </script>
+</body>
+</html>
