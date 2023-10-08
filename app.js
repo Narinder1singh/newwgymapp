@@ -10,10 +10,10 @@ app.use(express.urlencoded({extended:false}))
 const {mongoConnect} = require('./connections/connection')
 const user = require('./models/schemas')
 
+const mongoose = require('mongoose')
 
-// connect to mongoDB 
+
 mongoConnect()
-
 
 app.get('/',(req,res)=>{
     const filePath = path.join(__dirname, '/public/index.html');
@@ -49,7 +49,7 @@ app.post('/adduser', async(req,res)=>{
 
    app.post('/delete/:id', async (req,res)=>{
       const userid = req.params.id;
-      console.log(userid)
+     
       await user.findByIdAndDelete(userid)
      return  res.redirect('/');
    })
@@ -61,14 +61,15 @@ app.post('/adduser', async(req,res)=>{
     try {
       // Update user data in the MongoDB database
       // userid,  { payment: body.paymeny }
-      const use = await user.findByIdAndUpdate({_id:userid}, {$set:{
+      // const update = { $inc: { payment: 1 } }; 
+      const use = await user.updateOne({_id:userid}, {$inc:{
         payment
         :body.payment} });
     
   
       res.redirect('/');
     } catch (error) {
-      console.error(error);
+    
       res.status(500).send('Error updating user.');
     }
   });
